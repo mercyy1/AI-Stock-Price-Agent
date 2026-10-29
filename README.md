@@ -1,49 +1,48 @@
 # 🤖 AI Stock Price Agent
 
-A Node.js-powered application that uses AI to monitor, analyze, and act on stock market data. This project demonstrates automation, intelligent decision-making, and practical integration of financial APIs with a conversational interface.
+A command-line agent that answers plain-English stock questions. You ask something like *"How is Microsoft doing today?"*, an OpenAI model works out which ticker you mean, and the app fetches the latest intraday price from [Alpha Vantage](https://www.alphavantage.co/).
 
----
+```text
+# example session (prices are illustrative)
+💡 AI Stock Price Agent (OpenAI + Alpha Vantage)
+Type "exit" to quit.
 
-## 🚀 Features
+Ask about a stock (e.g. 'What's Apple trading at?'): how's nvidia looking
+🤖 AI processing your query...
+🔍 AI identified stock symbol: NVDA
 
-- 📈 Fetch real-time or simulated stock prices
-- 🧠 AI-powered analysis using custom logic or LLMs
-- 🗣️ Command-line chatbot interface
-- 🔄 Supports historical data and trend predictions
-- ⚙️ Easily extendable with plugins or APIs
+📊 Stock: NVDA
+📅 Time: 2025-05-30 19:55:00
+📈 Open: $135.10
+...
+```
 
----
+## How it works
 
-## 🛠️ Tech Stack
+1. **Understand the question.** The query goes to an OpenAI chat model with a system prompt that forces a one-word reply: the ticker, or `NONE`.
+2. **Validate.** The reply is checked against a ticker pattern (`AAPL`, `BRK.B`), so a chatty or wrong answer never reaches the price API.
+3. **Fetch.** The app calls Alpha Vantage's `TIME_SERIES_INTRADAY` endpoint (5-minute bars) and prints the most recent bar. Rate-limit and unknown-symbol responses are reported clearly instead of failing silently.
 
-- Node.js
-- JavaScript (ES6)
-- OpenAI / LangChain (optional integration)
-- dotenv for config management
+## Tech stack
 
----
+Node.js (ES modules) · OpenAI API · Alpha Vantage API · axios · dotenv · readline-sync
 
-## 🧪 Getting Started
+## Getting started
 
-### Prerequisites
-
-- Node.js installed (v18+ recommended)
-- OpenAI API key (optional, for AI functionality)
-
-### Installation
+**You'll need:** Node.js 18+, an [OpenAI API key](https://platform.openai.com/api-keys), and a free [Alpha Vantage key](https://www.alphavantage.co/support/#api-key).
 
 ```bash
-git clone https://github.com/yourusername/AI-Stock-Price-Agent.git
+git clone https://github.com/mercyy1/AI-Stock-Price-Agent.git
 cd AI-Stock-Price-Agent
 npm install
+cp .env.example .env   # then paste your keys into .env
+npm start
 ```
 
-### Usage
+Optional: set `OPENAI_MODEL` in `.env` to use a different chat model (defaults to `gpt-4`).
 
-```bash
-node index.js
-```
+## Limitations
 
-Edit .env.example → rename it to .env and insert your keys if using AI features.
-
-
+- Alpha Vantage's free tier allows only a small number of requests per day.
+- Intraday data covers US-listed tickers only.
+- It reports the latest price; it does not do analysis or predictions.
